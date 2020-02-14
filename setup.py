@@ -1,5 +1,5 @@
 from setuptools import setup
-from src.PyDebug.__version__ import version
+from src.PyDebug import version
 
 
 
@@ -15,7 +15,7 @@ setup(
         license='GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007',
         author='Tyler Stegmaier',
         author_email='tyler.stegmaier.510@gmail.com',
-        description='A pure python way to efficiently do a c++ style switch case in Python 3.6+.',
+        description='A set of helpers for debugging Python 3.x.',
         install_requires=[],
         classifiers=[
             # How mature is this project? Common values are
