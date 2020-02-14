@@ -7,7 +7,7 @@ from .console import PRINT, getPPrintStr
 
 
 
-__all__ = ['debug', 'class_method_debug', 'check_time', 'DebugTkinterEvent']
+__all__ = ['debug', 'class_method_debug', 'check_time', 'debugTkinterEvent', 'pprint_debug']
 
 
 
@@ -135,7 +135,7 @@ def check_time(*, cls: str or type = None, print_signature: bool = True, tag: st
 
 
 
-def DebugTkinterEvent(func: callable, tag: str = '_______________________________TkinterEvent_______________________________'):
+def debugTkinterEvent(func: callable, tag: str = '_______________________________TkinterEvent_______________________________'):
     @functools.wraps(func)
     def wrapper_debug(self, event: Event, *args, **kwargs):
         PRINT(f'{tag}\n{func.__class__}.{func.__name__}.{Event.__class__}', event.__dict__)
