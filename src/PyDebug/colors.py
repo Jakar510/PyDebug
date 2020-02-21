@@ -1,5 +1,9 @@
 import tkinter as tk
 
+__all__ = ['AllNamedColors', 'runTkColors']
+
+
+
 class AllNamedColors(object):
     all_widgets = []
     COLORS = [
@@ -107,6 +111,7 @@ class AllNamedColors(object):
 def runTkColors():
     Colors = AllNamedColors()
     Colors.run()
+
 
 if __name__ == '__main__':
     runTkColors()
