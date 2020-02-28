@@ -6,6 +6,7 @@ from .decorators import *
 from .colors import *
 from .__version__ import *
 
+import PyDebug.chains as Chains
 
 def get_size(obj, seen=None):
     """Recursively finds size of objects"""

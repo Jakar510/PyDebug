@@ -1,41 +1,12 @@
 import functools
 import time
 from tkinter import Event
-
+from .base import *
 from .console import getPPrintStr, pp
 
 
 
-
 __all__ = ['debug', 'class_method_debug', 'check_time', 'debugTkinterEvent', 'pprint_debug']
-
-DEFAULT_TAG = '\n______________________________________________________________\n"{0}"'
-
-def GetFuncModule(func: callable) -> str:
-    return func.__module__
-def GetFunctionName(func: callable) -> str:
-    if hasattr(func, '__qualname__'):
-        return func.__qualname__
-    elif hasattr(func, '__module__'):
-        return f"{func.__module__}.{func.__qualname__}"
-    else:
-        return func.__name__
-
-
-
-def _print_signature(func, tag, *args, **kwargs):
-    name = GetFunctionName(func)
-    print(tag.format(f'{name}'))
-
-    if args or kwargs:
-        try: args_repr = [repr(a) for a in args]  # 1
-        except: args_repr = [str(a) for a in args]  # 1
-
-        kwargs_repr = [f"{k}={v!r}" for k, v in kwargs.items()]  # 2
-
-        signature = ", ".join(args_repr + kwargs_repr)  # 3
-
-        print(f"{name}(\n{signature}\n)")
 
 
 def class_method_debug(cls: str or type, tag: str = DEFAULT_TAG):
@@ -57,6 +28,7 @@ def class_method_debug(cls: str or type, tag: str = DEFAULT_TAG):
         :return:
         """
         name = f"{cls}.{func.__name__}"
+
         @functools.wraps(func)
         def wrapper_debug(*args, **kwargs):
             print(tag.format(name))
@@ -87,9 +59,10 @@ def debug(func: callable, tag: str = DEFAULT_TAG):
     :return:
     """
     name = GetFunctionName(func)
+
     @functools.wraps(func)
     def wrapper_debug(*args, **kwargs):
-        _print_signature(func, tag, *args, **kwargs)
+        print_signature(func, tag, *args, **kwargs)
         result = func(*args, **kwargs)
         print(f"{name}  returned  {result!r}\n")  # 4
 
@@ -107,6 +80,7 @@ def pprint_debug(func: callable, tag: str = DEFAULT_TAG):
     :return:
     """
     name = GetFunctionName(func)
+
     @functools.wraps(func)
     def wrapper_debug(*args, **kwargs):
         print(tag.format(name))
@@ -134,6 +108,7 @@ def check_cls_time(*, cls: str or type = None, print_signature: bool = True, tag
 
     def timeit(func: callable):
         name = GetFunctionName(func)
+
         @functools.wraps(func)
         def timed(*args, **kwargs):
             print(tag.format(name))
@@ -163,9 +138,10 @@ def check_cls_time(*, cls: str or type = None, print_signature: bool = True, tag
 
 def check_time(func: callable, tag: str = DEFAULT_TAG):
     name = GetFunctionName(func)
+
     @functools.wraps(func)
     def timed(*args, **kwargs):
-        _print_signature(func, tag, *args, **kwargs)
+        print_signature(func, tag, *args, **kwargs)
 
         start_time = time.time()
         result = func(*args, **kwargs)
@@ -179,6 +155,7 @@ def check_time(func: callable, tag: str = DEFAULT_TAG):
 
 def debugTkinterEvent(func: callable, tag: str = DEFAULT_TAG):
     name = GetFunctionName(func)
+
     @functools.wraps(func)
     def wrapper_debug(self, event: Event, *args, **kwargs):
         print(tag.format(f'{name}'))
