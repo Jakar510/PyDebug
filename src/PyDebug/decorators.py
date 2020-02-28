@@ -2,14 +2,41 @@ import functools
 import time
 from tkinter import Event
 
-from .console import PRINT, getPPrintStr
+from .console import getPPrintStr, pp
 
 
 
 
 __all__ = ['debug', 'class_method_debug', 'check_time', 'debugTkinterEvent', 'pprint_debug']
 
-DEFAULT_TAG = '\n_______________________________  "{0}"  _______________________________'
+DEFAULT_TAG = '\n______________________________________________________________\n"{0}"'
+
+def GetFuncModule(func: callable) -> str:
+    return func.__module__
+def GetFunctionName(func: callable) -> str:
+    if hasattr(func, '__qualname__'):
+        return func.__qualname__
+    elif hasattr(func, '__module__'):
+        return f"{func.__module__}.{func.__qualname__}"
+    else:
+        return func.__name__
+
+
+
+def _print_signature(func, tag, *args, **kwargs):
+    name = GetFunctionName(func)
+    print(tag.format(f'{name}'))
+
+    if args or kwargs:
+        try: args_repr = [repr(a) for a in args]  # 1
+        except: args_repr = [str(a) for a in args]  # 1
+
+        kwargs_repr = [f"{k}={v!r}" for k, v in kwargs.items()]  # 2
+
+        signature = ", ".join(args_repr + kwargs_repr)  # 3
+
+        print(f"{name}(\n{signature}\n)")
+
 
 def class_method_debug(cls: str or type, tag: str = DEFAULT_TAG):
     """
@@ -29,18 +56,21 @@ def class_method_debug(cls: str or type, tag: str = DEFAULT_TAG):
         :param func: callable function to be debugged.
         :return:
         """
+        name = f"{cls}.{func.__name__}"
         @functools.wraps(func)
         def wrapper_debug(*args, **kwargs):
-            try: args_repr = [repr(a) for a in args]  # 1
-            except: args_repr = [str(a) for a in args]  # 1
+            print(tag.format(name))
+            if args or kwargs:
+                try: args_repr = [repr(a) for a in args]  # 1
+                except: args_repr = [str(a) for a in args]  # 1
 
-            kwargs_repr = [f"{k}={v!r}" for k, v in kwargs.items()]  # 2
+                kwargs_repr = [f"{k}={v!r}" for k, v in kwargs.items()]  # 2
 
-            signature = ", ".join(args_repr + kwargs_repr)  # 3
+                signature = ", ".join(args_repr + kwargs_repr)  # 3
 
-            print(f"{tag.format(f'{func.__module__}.{func.__qualname__}')} \n{cls}.{func.__name__}(\n{signature}\n)")
+                print(f"{name}(\n      {signature}\n   )")
             result = func(*args, **kwargs)
-            print(f"{func.__name__}  returned  {result!r}\n")  # 4
+            print(f"{name}  returned  {result!r}\n")  # 4
 
             return result
         return wrapper_debug
@@ -56,18 +86,12 @@ def debug(func: callable, tag: str = DEFAULT_TAG):
     :param tag: a unique string to identify the output in the console window.
     :return:
     """
+    name = GetFunctionName(func)
     @functools.wraps(func)
     def wrapper_debug(*args, **kwargs):
-        try: args_repr = [repr(a) for a in args]  # 1
-        except: args_repr = [str(a) for a in args]  # 1
-
-        kwargs_repr = [f"{k}={v!r}" for k, v in kwargs.items()]  # 2
-
-        signature = ", ".join(args_repr + kwargs_repr)  # 3
-
-        print(f"{tag.format(f'{func.__module__}.{func.__qualname__}')} \n{func.__qualname__}(\n{signature}\n)")
+        _print_signature(func, tag, *args, **kwargs)
         result = func(*args, **kwargs)
-        print(f"{func.__name__}  returned  {result!r}\n")  # 4
+        print(f"{name}  returned  {result!r}\n")  # 4
 
         return result
     return wrapper_debug
@@ -82,19 +106,21 @@ def pprint_debug(func: callable, tag: str = DEFAULT_TAG):
     :param tag: a unique string to identify the output in the console window.
     :return:
     """
+    name = GetFunctionName(func)
     @functools.wraps(func)
     def wrapper_debug(*args, **kwargs):
+        print(tag.format(name))
         signature = getPPrintStr({'kwargs': kwargs, 'args': args, })
-        print(f"{tag.format(f'{func.__module__}.{func.__qualname__}')} \n{func.__qualname__}(\n{signature}\n)")
+        print(f"{name}(\n      {signature}\n   )")
         result = func(*args, **kwargs)
-        print(f"{func.__name__}  returned  {result!r}\n")
+        print(f"{name}  returned: \n{getPPrintStr(result)}\n")
 
         return result
     return wrapper_debug
 
 
 
-def check_time(*, cls: str or type = None, print_signature: bool = True, tag: str = DEFAULT_TAG):
+def check_cls_time(*, cls: str or type = None, print_signature: bool = True, tag: str = DEFAULT_TAG):
     """
         Print the function signature and return value
 
@@ -107,9 +133,10 @@ def check_time(*, cls: str or type = None, print_signature: bool = True, tag: st
         cls = cls.__name__
 
     def timeit(func: callable):
+        name = GetFunctionName(func)
         @functools.wraps(func)
         def timed(*args, **kwargs):
-            print(tag)
+            print(tag.format(name))
             if print_signature:
                 try: args_repr = [repr(a) for a in args]  # 1
                 except: args_repr = [str(a) for a in args]  # 1
@@ -125,8 +152,8 @@ def check_time(*, cls: str or type = None, print_signature: bool = True, tag: st
 
             start_time = time.time()
             result = func(*args, **kwargs)
-            print(f'{func.__name__}  took  {time.time() - start_time}')
-            print(f"{func.__name__}  returned  {result!r}\n")  # 4
+            print(f'{name}  took  {time.time() - start_time}')
+            print(f"{name}  returned  {result!r}\n")  # 4
             return result
 
         return timed
@@ -134,12 +161,32 @@ def check_time(*, cls: str or type = None, print_signature: bool = True, tag: st
 
 
 
+def check_time(func: callable, tag: str = DEFAULT_TAG):
+    name = GetFunctionName(func)
+    @functools.wraps(func)
+    def timed(*args, **kwargs):
+        _print_signature(func, tag, *args, **kwargs)
+
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        print(f'{name}  took  {time.time() - start_time}')
+        print(f"{name}  returned  {result!r}\n")
+        return result
+
+    return timed
+
+
+
 def debugTkinterEvent(func: callable, tag: str = DEFAULT_TAG):
+    name = GetFunctionName(func)
     @functools.wraps(func)
     def wrapper_debug(self, event: Event, *args, **kwargs):
-        PRINT(f'{tag.format("TkinterEvent")}\n{func.__class__}.{func.__name__}.{Event.__class__}', event.__dict__)
+        print(tag.format(f'{name}'))
+        print(f'{name}.{event.__class__}')
+        pp.pprint(event.__dict__)
 
         result = func(self, event, *args, **kwargs)
+        print(f"{name}  returned  {result!r}\n")
 
         return result
 
