@@ -4,6 +4,9 @@ from .console import getPPrintStr
 
 
 DEFAULT_TAG = '\n______________________________________________________________\n"{0}"'
+END_TAG = '\n=============================================================\n'
+
+
 
 def GetFuncModule(func: callable) -> str:
     return func.__module__

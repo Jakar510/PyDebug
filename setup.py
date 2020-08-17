@@ -7,6 +7,7 @@ from src.PyDebug import version
 data_files = [
         'PyDebug/*.py'
         ]
+
 setup(
         name='PyDebug',
         version=version,
@@ -18,30 +19,29 @@ setup(
         description='A set of helpers for debugging Python 3.x.',
         install_requires=[],
         classifiers=[
-            # How mature is this project? Common values are
-            #   3 - Alpha
-            #   4 - Beta
-            #   5 - Production/Stable
-            'Development Status :: 3 - Alpha',
+                # How mature is this project? Common values are
+                #   3 - Alpha
+                #   4 - Beta
+                #   5 - Production/Stable
+                'Development Status :: 3 - Alpha',
 
-            # Indicate who your project is intended for
-            'Intended Audience :: Developers',
-            'Topic :: Software Development :: Build Tools',
+                # Indicate who your project is intended for
+                'Intended Audience :: Developers',
+                'Topic :: Software Development :: Build Tools',
 
-            # Pick your license as you wish
-            'License :: Free To Use But Restricted',
+                # Pick your license as you wish
+                'License :: Free To Use But Restricted',
 
-            # Support platforms
-            'Operating System :: MacOS',
-            'Operating System :: Microsoft :: Windows',
-            'Operating System :: POSIX',
+                # Support platforms
+                'Operating System :: MacOS',
+                'Operating System :: Microsoft :: Windows',
+                'Operating System :: POSIX',
 
-            'Programming Language :: Python :: 3',
-        ],
+                'Programming Language :: Python :: 3',
+                ],
         keywords='switch switch-case case',
-        package_dir={'PyDebug': 'src/PyDebug'},
+        package_dir={ 'PyDebug': 'src/PyDebug' },
         package_data={
                 'PyDebug': data_files,
-            },
+                },
         )
-
