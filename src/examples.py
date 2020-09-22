@@ -1,6 +1,6 @@
 import time
 import tkinter as tk
-from PyDebug import *
+from PythonDebugTools import *
 
 if __name__ == '__main__':
 

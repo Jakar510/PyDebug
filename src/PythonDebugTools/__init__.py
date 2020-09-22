@@ -7,11 +7,11 @@ from .colors import *
 from .__version__ import *
 
 
-def get_size(obj, seen=None):
+def get_size(obj, seen: set = set()):
     """Recursively finds size of objects"""
     size = sys.getsizeof(obj)
-    if seen is None:
-        seen = set()
+    if seen is None: seen = set()
+
     obj_id = id(obj)
     if obj_id in seen:
         return 0

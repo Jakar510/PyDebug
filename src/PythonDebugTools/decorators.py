@@ -1,12 +1,15 @@
 import functools
 import time
+import traceback
 from tkinter import Event
+
 from .base import *
 from .console import getPPrintStr, pp
 
 
 
-__all__ = ['debug', 'class_method_debug', 'check_time', 'debugTkinterEvent', 'pprint_debug']
+
+__all__ = ['debug', 'class_method_debug', 'check_time', 'debugTkinterEvent', 'pprint_debug', 'stacktrace']
 
 
 def class_method_debug(cls: str or type, tag: str = DEFAULT_TAG):
@@ -84,7 +87,7 @@ def pprint_debug(func: callable, tag: str = DEFAULT_TAG):
     @functools.wraps(func)
     def wrapper_debug(*args, **kwargs):
         print(tag.format(name))
-        signature = getPPrintStr({'kwargs': kwargs, 'args': args, })
+        signature = getPPrintStr({ 'kwargs': kwargs, 'args': args, })
         print(f"{name}(\n      {signature}\n   )")
         result = func(*args, **kwargs)
         print(f"{name}  returned: \n{getPPrintStr(result)}\n")
@@ -169,3 +172,24 @@ def debugTkinterEvent(func: callable, tag: str = DEFAULT_TAG):
 
     return wrapper_debug
 
+
+
+def stacktrace(func, INDENT=4 * ' '):
+    """
+        Get all but last line returned by traceback.format_stack() which is the line below.
+
+    :param func:
+    :type func:
+    :param INDENT:
+    :type INDENT:
+    :return:
+    :rtype:
+    """
+    @functools.wraps(func)
+    def wrapped(*args, **kwds):
+        callstack = '\n'.join([INDENT + line.strip() for line in traceback.format_stack()][:-1])
+        print('{}() called:'.format(func.__name__))
+        print(callstack)
+        return func(*args, **kwds)
+
+    return wrapped

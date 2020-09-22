@@ -1,18 +1,20 @@
 from setuptools import setup
-from src.PyDebug import version
+
+from src.PythonDebugTools import version
 
 
 
 
 data_files = [
-        'PyDebug/*.py'
+        'PythonDebugTools/*.py'
         ]
 
 setup(
-        name='PyDebug',
+        name='PythonDebugTools',
         version=version,
-        packages=['PyDebug'],
+        packages=['PythonDebugTools'],
         url='https://github.com/Jakar510/PyDebug',
+        download_url='https://github.com/Jakar510/PyDebug/releases/tag/v1.5.0',
         license='GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007',
         author='Tyler Stegmaier',
         author_email='tyler.stegmaier.510@gmail.com',
@@ -23,7 +25,7 @@ setup(
                 #   3 - Alpha
                 #   4 - Beta
                 #   5 - Production/Stable
-                'Development Status :: 3 - Alpha',
+                'Development Status :: 4 - Beta',
 
                 # Indicate who your project is intended for
                 'Intended Audience :: Developers',
@@ -40,8 +42,8 @@ setup(
                 'Programming Language :: Python :: 3',
                 ],
         keywords='switch switch-case case',
-        package_dir={ 'PyDebug': 'src/PyDebug' },
+        package_dir={ 'PythonDebugTools': 'src/PythonDebugTools' },
         package_data={
-                'PyDebug': data_files,
+                'PythonDebugTools': data_files,
                 },
         )
