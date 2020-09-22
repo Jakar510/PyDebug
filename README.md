@@ -1,4 +1,4 @@
-# PyDebug
+# PythonDebugTools
 
 debug helper functions
 
