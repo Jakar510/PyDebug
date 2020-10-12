@@ -1,10 +1,12 @@
 import sys
 
-from .converters import *
-from .console import *
-from .decorators import *
-from .colors import *
 from .__version__ import *
+from .colors import *
+from .console import *
+from .converters import *
+from .decorators import *
+
+
 
 
 def get_size(obj, seen: set = set()):
@@ -26,4 +28,3 @@ def get_size(obj, seen: set = set()):
     elif hasattr(obj, '__iter__') and not isinstance(obj, (str, bytes, bytearray)):
         size += sum([get_size(i, seen) for i in obj])
     return size
-

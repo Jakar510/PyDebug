@@ -9,15 +9,15 @@ if __name__ == '__main__':
         def pp_run(self, *args, **kwargs):
             pass
 
-        @debug
+        @Debug
         def run(self, *args, **kwargs):
             pass
 
-        @debugTkinterEvent
+        @DebugTkinterEvent
         def tk_run(self, event: tk.Event):
             pass
 
-        @check_time
+        @CheckTime
         def timed(self, *args, **kwargs):
             time.sleep(1)
 

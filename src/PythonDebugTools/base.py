@@ -37,7 +37,7 @@ def print_signature(func: callable, tag: str, *args, **kwargs):
         # signature = ", ".join(args_repr + kwargs_repr)  # 3
         #
         # print(f"{name}(\n{signature}\n)")
-        signature = getPPrintStr({'kwargs': kwargs, 'args': args, })
+        signature = getPPrintStr({ 'kwargs': kwargs, 'args': args, })
         print(f"{name}(\n      {signature}\n   )")
         result = func(*args, **kwargs)
         print(f"{name}  returned: \n{getPPrintStr(result)}\n")

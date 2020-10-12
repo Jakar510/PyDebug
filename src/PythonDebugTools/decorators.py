@@ -4,15 +4,15 @@ import traceback
 from tkinter import Event
 
 from .base import *
-from .console import getPPrintStr, pp
+from .console import pp
 
 
 
 
-__all__ = ['debug', 'class_method_debug', 'check_time', 'debugTkinterEvent', 'pprint_debug', 'stacktrace']
+__all__ = ['Debug', 'ClassMethodDebug', 'CheckTime', 'CheckTimeWithSignature', 'DebugTkinterEvent', 'SimpleDebug', 'StackTrace', 'StackTraceWithSignature']
 
 
-def class_method_debug(cls: str or type, tag: str = DEFAULT_TAG):
+def ClassMethodDebug(cls: str or type, tag: str = DEFAULT_TAG):
     """
         Print the function signature and return value
 
@@ -53,7 +53,7 @@ def class_method_debug(cls: str or type, tag: str = DEFAULT_TAG):
 
 
 
-def debug(func: callable, tag: str = DEFAULT_TAG):
+def Debug(func: callable, tag: str = DEFAULT_TAG):
     """
         Print the function signature and return value
 
@@ -71,37 +71,31 @@ def debug(func: callable, tag: str = DEFAULT_TAG):
 
         return result
     return wrapper_debug
-
-
-
-def pprint_debug(func: callable, tag: str = DEFAULT_TAG):
+def SimpleDebug(func: callable):
     """
         Print the function signature and return value
 
     :param func: callable function to be debugged.
-    :param tag: a unique string to identify the output in the console window.
     :return:
     """
     name = GetFunctionName(func)
 
     @functools.wraps(func)
     def wrapper_debug(*args, **kwargs):
-        print(tag.format(name))
-        signature = getPPrintStr({ 'kwargs': kwargs, 'args': args, })
-        print(f"{name}(\n      {signature}\n   )")
+        print(f"--------- CALLED: {name}\n")
         result = func(*args, **kwargs)
-        print(f"{name}  returned: \n{getPPrintStr(result)}\n")
+        print(f"--------- ENDED: {name}\n")
 
         return result
     return wrapper_debug
 
 
 
-def check_cls_time(*, cls: str or type = None, print_signature: bool = True, tag: str = DEFAULT_TAG):
+def CheckClsTime(*, cls: str or type = None, printSignature: bool = True, tag: str = DEFAULT_TAG):
     """
         Print the function signature and return value
 
-    :param print_signature:
+    :param printSignature:
     :param cls: class string or type to describe the method's parent or caller.
     :param tag: a unique string to identify the output in the console window.
     :return:
@@ -115,7 +109,7 @@ def check_cls_time(*, cls: str or type = None, print_signature: bool = True, tag
         @functools.wraps(func)
         def timed(*args, **kwargs):
             print(tag.format(name))
-            if print_signature:
+            if printSignature:
                 try: args_repr = [repr(a) for a in args]  # 1
                 except: args_repr = [str(a) for a in args]  # 1
 
@@ -137,9 +131,22 @@ def check_cls_time(*, cls: str or type = None, print_signature: bool = True, tag
         return timed
     return timeit
 
+def RoundFloat(Float: float, Precision: int) -> str:
+    """ Rounds the Float to the given Precision and returns It as string. """
+    return f"{Float:.{Precision}f}"
+def CheckTime(func: callable, Precision: int = 4):
+    name = GetFunctionName(func)
 
+    @functools.wraps(func)
+    def timed(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        t = time.time() - start_time
+        print(f'{name}  took:  {RoundFloat(t, Precision=Precision)}')
+        return result
 
-def check_time(func: callable, tag: str = DEFAULT_TAG):
+    return timed
+def CheckTimeWithSignature(func: callable, Precision: int = 4, tag: str = DEFAULT_TAG):
     name = GetFunctionName(func)
 
     @functools.wraps(func)
@@ -148,7 +155,8 @@ def check_time(func: callable, tag: str = DEFAULT_TAG):
 
         start_time = time.time()
         result = func(*args, **kwargs)
-        print(f'{name}  took  {time.time() - start_time}')
+        t = time.time() - start_time
+        print(f'{name}  took:  {RoundFloat(t, Precision=Precision)}')
         print(f"{name}  returned  {result!r}\n")
         return result
 
@@ -156,7 +164,7 @@ def check_time(func: callable, tag: str = DEFAULT_TAG):
 
 
 
-def debugTkinterEvent(func: callable, tag: str = DEFAULT_TAG):
+def DebugTkinterEvent(func: callable, tag: str = DEFAULT_TAG):
     name = GetFunctionName(func)
 
     @functools.wraps(func)
@@ -174,7 +182,7 @@ def debugTkinterEvent(func: callable, tag: str = DEFAULT_TAG):
 
 
 
-def stacktrace(func, INDENT=4 * ' '):
+def StackTrace(func, INDENT=4 * ' '):
     """
         Get all but last line returned by traceback.format_stack() which is the line below.
 
@@ -185,11 +193,38 @@ def stacktrace(func, INDENT=4 * ' '):
     :return:
     :rtype:
     """
+    name = GetFunctionName(func)
+
     @functools.wraps(func)
-    def wrapped(*args, **kwds):
+    def wrapped(*args, **kwargs):
         callstack = '\n'.join([INDENT + line.strip() for line in traceback.format_stack()][:-1])
-        print('{}() called:'.format(func.__name__))
+        print(f'{name}() called:')
         print(callstack)
-        return func(*args, **kwds)
+        result = func(*args, **kwargs)
+        print(f"{name}  returned  {result!r}\n")
+
+    return wrapped
+def StackTraceWithSignature(func, INDENT=4 * ' ', tag: str = DEFAULT_TAG):
+    """
+        Get all but last line returned by traceback.format_stack() which is the line below.
+
+    :param tag:
+    :type tag:
+    :param func:
+    :type func:
+    :param INDENT:
+    :type INDENT:
+    :return:
+    :rtype:
+    """
+    name = GetFunctionName(func)
+
+    @functools.wraps(func)
+    def wrapped(*args, **kwargs):
+        callstack = '\n'.join([INDENT + line.strip() for line in traceback.format_stack()][:-1])
+        print_signature(func, tag, *args, **kwargs)
+        print(callstack)
+        result = func(*args, **kwargs)
+        print(f"{name}  returned  {result!r}\n")
 
     return wrapped
