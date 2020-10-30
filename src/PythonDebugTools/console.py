@@ -7,9 +7,9 @@ import traceback
 __all__ = ['PRINT', 'getPPrintStr', 'print_exception']
 
 pp = pprint.PrettyPrinter(indent=4)
-def PRINT(title: str, o: object):
+def PRINT(title: str, *args, **kwargs):
     print(f"\n ---------------- {title} ---------------- \n\r")
-    pp.pprint(o)
+    pp.pprint(dict(args=args, kwargs=kwargs))
 
 
 
