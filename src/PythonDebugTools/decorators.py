@@ -11,6 +11,7 @@ from .console import pp
 
 __all__ = ['Debug', 'ClassMethodDebug', 'CheckTime', 'CheckTimeWithSignature', 'DebugTkinterEvent', 'SimpleDebug', 'StackTrace', 'StackTraceWithSignature']
 
+debug = __debug__
 
 def ClassMethodDebug(cls: str or type, tag: str = DEFAULT_TAG):
     """
@@ -34,18 +35,19 @@ def ClassMethodDebug(cls: str or type, tag: str = DEFAULT_TAG):
 
         @functools.wraps(func)
         def wrapper_debug(*args, **kwargs):
-            print(tag.format(name))
-            if args or kwargs:
-                try: args_repr = [repr(a) for a in args]  # 1
-                except: args_repr = [str(a) for a in args]  # 1
+            if debug:
+                print(tag.format(name))
+                if args or kwargs:
+                    try: args_repr = [repr(a) for a in args]  # 1
+                    except: args_repr = [str(a) for a in args]  # 1
 
-                kwargs_repr = [f"{k}={v!r}" for k, v in kwargs.items()]  # 2
+                    kwargs_repr = [f"{k}={v!r}" for k, v in kwargs.items()]  # 2
 
-                signature = ", ".join(args_repr + kwargs_repr)  # 3
+                    signature = ", ".join(args_repr + kwargs_repr)  # 3
 
-                print(f"{name}(\n      {signature}\n   )")
+                    print(f"{name}(\n      {signature}\n   )")
             result = func(*args, **kwargs)
-            print(f"{name}  returned  {result!r}\n")  # 4
+            if debug: print(f"{name}  returned  {result!r}\n")  # 4
 
             return result
         return wrapper_debug
@@ -65,9 +67,9 @@ def Debug(func: callable, tag: str = DEFAULT_TAG):
 
     @functools.wraps(func)
     def wrapper_debug(*args, **kwargs):
-        print_signature(func, tag, *args, **kwargs)
+        if debug: print_signature(func, tag, *args, **kwargs)
         result = func(*args, **kwargs)
-        print(f"{name}  returned  {result!r}\n")  # 4
+        if debug: print(f"{name}  returned  {result!r}\n")  # 4
 
         return result
     return wrapper_debug
@@ -82,9 +84,9 @@ def SimpleDebug(func: callable):
 
     @functools.wraps(func)
     def wrapper_debug(*args, **kwargs):
-        print(f"--------- CALLED: {name}\n")
+        if debug: print(f"--------- CALLED: {name}\n")
         result = func(*args, **kwargs)
-        print(f"--------- ENDED: {name}\n")
+        if debug: print(f"--------- ENDED: {name}\n")
 
         return result
     return wrapper_debug
@@ -100,32 +102,33 @@ def CheckClsTime(*, cls: str or type = None, printSignature: bool = True, tag: s
     :param tag: a unique string to identify the output in the console window.
     :return:
     """
-    if isinstance(cls, type):
-        cls = cls.__name__
+    if isinstance(cls, type): cls = cls.__name__
 
     def timeit(func: callable):
         name = GetFunctionName(func)
 
         @functools.wraps(func)
         def timed(*args, **kwargs):
-            print(tag.format(name))
-            if printSignature:
-                try: args_repr = [repr(a) for a in args]  # 1
-                except: args_repr = [str(a) for a in args]  # 1
+            if debug:
+                print(tag.format(name))
+                if printSignature:
+                    try: args_repr = [repr(a) for a in args]  # 1
+                    except: args_repr = [str(a) for a in args]  # 1
 
-                kwargs_repr = [f"{k}={v!r}" for k, v in kwargs.items()]  # 2
+                    kwargs_repr = [f"{k}={v!r}" for k, v in kwargs.items()]  # 2
 
-                signature = ", ".join(args_repr + kwargs_repr)  # 3
+                    signature = ", ".join(args_repr + kwargs_repr)  # 3
 
-                if cls is not None:
-                    print(f"\n{cls}.{func.__name__}\n{signature}")
-                else:
-                    print(f"\n{func.__name__}\n{signature}")
+                    if cls is not None:
+                        print(f"\n{cls}.{func.__name__}\n{signature}")
+                    else:
+                        print(f"\n{func.__name__}\n{signature}")
 
             start_time = time.time()
             result = func(*args, **kwargs)
-            print(f'{name}  took  {time.time() - start_time}')
-            print(f"{name}  returned  {result!r}\n")  # 4
+            if debug:
+                print(f'{name}  took  {time.time() - start_time}')
+                print(f"{name}  returned  {result!r}\n")  # 4
             return result
 
         return timed
@@ -141,8 +144,9 @@ def CheckTime(func: callable, Precision: int = 4):
     def timed(*args, **kwargs):
         start_time = time.time()
         result = func(*args, **kwargs)
-        t = time.time() - start_time
-        print(f'{name}  took:  {RoundFloat(t, Precision=Precision)}')
+        if debug:
+            t = time.time() - start_time
+            print(f'{name}  took:  {RoundFloat(t, Precision=Precision)}')
         return result
 
     return timed
@@ -155,9 +159,10 @@ def CheckTimeWithSignature(func: callable, Precision: int = 4, tag: str = DEFAUL
 
         start_time = time.time()
         result = func(*args, **kwargs)
-        t = time.time() - start_time
-        print(f'{name}  took:  {RoundFloat(t, Precision=Precision)}')
-        print(f"{name}  returned  {result!r}\n")
+        if debug:
+            t = time.time() - start_time
+            print(f'{name}  took:  {RoundFloat(t, Precision=Precision)}')
+            print(f"{name}  returned  {result!r}\n")
         return result
 
     return timed
@@ -169,12 +174,13 @@ def DebugTkinterEvent(func: callable, tag: str = DEFAULT_TAG):
 
     @functools.wraps(func)
     def wrapper_debug(self, event: Event, *args, **kwargs):
-        print(tag.format(f'{name}'))
-        print(f'{name}.{event.__class__}')
-        pp.pprint(event.__dict__)
+        if debug:
+            print(tag.format(f'{name}'))
+            print(f'{name}.{event.__class__}')
+            pp.pprint(event.__dict__)
 
         result = func(self, event, *args, **kwargs)
-        print(f"{name}  returned  {result!r}\n")
+        if debug: print(f"{name}  returned  {result!r}\n")
 
         return result
 
@@ -197,11 +203,12 @@ def StackTrace(func, INDENT=4 * ' '):
 
     @functools.wraps(func)
     def wrapped(*args, **kwargs):
-        callstack = '\n'.join([INDENT + line.strip() for line in traceback.format_stack()][:-1])
-        print(f'{name}() called:')
-        print(callstack)
+        if debug:
+            callstack = '\n'.join([INDENT + line.strip() for line in traceback.format_stack()][:-1])
+            print(f'{name}() called:')
+            print(callstack)
         result = func(*args, **kwargs)
-        print(f"{name}  returned  {result!r}\n")
+        if debug: print(f"{name}  returned  {result!r}\n")
 
     return wrapped
 def StackTraceWithSignature(func, INDENT=4 * ' ', tag: str = DEFAULT_TAG):
@@ -221,10 +228,11 @@ def StackTraceWithSignature(func, INDENT=4 * ' ', tag: str = DEFAULT_TAG):
 
     @functools.wraps(func)
     def wrapped(*args, **kwargs):
-        callstack = '\n'.join([INDENT + line.strip() for line in traceback.format_stack()][:-1])
-        print_signature(func, tag, *args, **kwargs)
-        print(callstack)
+        if debug:
+            callstack = '\n'.join([INDENT + line.strip() for line in traceback.format_stack()][:-1])
+            print_signature(func, tag, *args, **kwargs)
+            print(callstack)
         result = func(*args, **kwargs)
-        print(f"{name}  returned  {result!r}\n")
+        if debug: print(f"{name}  returned  {result!r}\n")
 
     return wrapped

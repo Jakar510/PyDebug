@@ -6,24 +6,22 @@ from .console import getPPrintStr
 DEFAULT_TAG = '\n______________________________________________________________\n"{0}"'
 END_TAG = '\n=============================================================\n'
 
+debug = __debug__
 
 
-def GetFuncModule(func: callable) -> str:
-    return func.__module__
+def GetFuncModule(func: callable) -> str: return func.__module__
 
 
 
 def GetFunctionName(func: callable) -> str:
-    if hasattr(func, '__qualname__'):
-        return func.__qualname__
-    elif hasattr(func, '__module__'):
-        return f"{func.__module__}.{func.__qualname__}"
-    else:
-        return func.__name__
+    if hasattr(func, '__qualname__') and hasattr(func, '__module__'): return f"{func.__module__}.{func.__qualname__}"
+    elif hasattr(func, '__qualname__'): return func.__qualname__
+    else: return func.__name__
 
 
 
 def print_signature(func: callable, tag: str, *args, **kwargs):
+    if not debug: return
     assert ('{0}' in tag)
     name = GetFunctionName(func)
     print(tag.format(f'{name}'))
