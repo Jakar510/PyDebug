@@ -2,54 +2,39 @@ import os
 
 from setuptools import setup
 
-from src.PythonDebugTools import version
+from src.PythonDebugTools import __author__, __classifiers__, __email__, __license__, __maintainer__, __maintainer_email__, __name__, __short_description__, __url__, __version__
 
 
 
+
+with open(os.path.abspath("requirements.txt"), "r") as f:
+    install_requires = f.readlines()
 
 with open(os.path.abspath("README.md"), "r") as f:
     long_description = f.read()
 
 data_files = [
-        'PythonDebugTools/*.py'
+        f'{__name__}/*.py'
         ]
 
-setup(name='PythonDebugTools',
-      version=version,
-      packages=['PythonDebugTools'],
-      url='https://github.com/Jakar510/PythonDebugTools',
+setup(name=__name__,
+      version=__version__,
+      packages=[__name__],
+      url=__url__,
       # download_url=f'https://github.com/Jakar510/PythonDebugTools/releases/tag/{version}',
-      license='GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007',
-      author='Tyler Stegmaier',
-      author_email='tyler.stegmaier.510@gmail.com',
-      description='A set of helpers for debugging Python 3.x.',
+      license=__license__ or 'GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007',
+      author=__author__,
+      author_email=__email__,
+      maintainer=__maintainer__,
+      maintainer_email=__maintainer_email__,
+      description=__short_description__,
       long_description=long_description,
       long_description_content_type="text/markdown",
-      install_requires=[],
-      classifiers=[
-              # How mature is this project? Common values are
-              #   3 - Alpha
-              #   4 - Beta
-              #   5 - Production/Stable
-              'Development Status :: 4 - Beta',
-
-              # Indicate who your project is intended for
-              'Intended Audience :: Developers',
-              'Topic :: Software Development :: Build Tools',
-
-              # Pick your license as you wish
-              'License :: Free To Use But Restricted',
-
-              # Support platforms
-              'Operating System :: MacOS',
-              'Operating System :: Microsoft :: Windows',
-              'Operating System :: POSIX',
-
-              'Programming Language :: Python :: 3',
-              ],
+      install_requires=install_requires,
+      classifiers=__classifiers__,
       keywords='switch switch-case case',
-      package_dir={ 'PythonDebugTools': 'src/PythonDebugTools' },
+      package_dir={ __name__: f'src/{__name__}' },
       package_data={
-              'PythonDebugTools': data_files,
+              __name__: data_files,
               },
       )
