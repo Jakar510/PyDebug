@@ -1,10 +1,10 @@
 from .__version__ import *
+from .chains import *
 from .colors import *
 from .console import *
 from .converters import *
 from .decorators import *
 from .misc import *
-from .chains import *
 
 
 

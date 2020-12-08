@@ -1,7 +1,9 @@
 import json
 import os
+import string
 import time
 import sys
+import threading
 
 import tkinter as tk
 from PythonDebugTools import *
@@ -10,6 +12,11 @@ from PythonDebugTools import *
 
 
 if __name__ == '__main__':
+    _pp = Printer.Default()
+    print('_pp is pp', _pp is pp)
+    Printer.Set(_pp)
+    print('_pp is pp', _pp is pp)
+
     class test(object):
         @Debug()
         def pp_run(self, *args, **kwargs):
@@ -54,32 +61,49 @@ if __name__ == '__main__':
         def sub2(self, *args, **kwargs):
             return 'chain.sub.end', args, kwargs
 
+    def _json():
+        print('_json')
+        path = os.path.abspath(sys.argv[1])
 
+        with open(path, 'r') as f:
+            d = json.load(f)
 
+        PRINT('__json__', d)
+
+    _threads = []
+    _threads.append(threading.Thread(target=_json, daemon=True))
     t = test()
 
-    t.run()
-    t.pp_run()
-    t.timed(1)
-    t.timed_sig(1)
-
-    evt = tk.Event()
-    evt.widget = None
-    evt.x = None
-    evt.y = None
-    t.tk_run(evt)
 
 
-    t.stack(1, 2, 3, test=True, print=False)
-    t.stack_sig(1, 2, 3, test=True, print=True)
+    def _t1():
+        print('_t1')
+        t.run()
+        t.pp_run()
+        t.timed(1)
+        t.timed_sig(1)
 
-    t.chain_root()
+        t.stack(1, 2, 3, test=True, print=False)
+        t.stack_sig(1, 2, 3, test=True, print=True)
 
+    _threads.append(threading.Thread(target=_t1, daemon=True))
 
+    def _t2():
+        print('_t2')
+        evt = tk.Event()
+        evt.widget = None
+        evt.x = None
+        evt.y = None
+        t.tk_run(evt)
 
-    path = os.path.abspath(sys.argv[1])
+        t.stack(*string.ascii_lowercase)
+        t.stack_sig(*string.ascii_uppercase)
 
-    with open(path, 'r') as f:
-        d = json.load(f)
+        t.chain_root()
+    _threads.append(threading.Thread(target=_t2, daemon=True))
 
-    # Print(getPPrintStr(d))
+    for _t in _threads:
+        _t.start()
+        _t.join()
+
+    print('__fin__')

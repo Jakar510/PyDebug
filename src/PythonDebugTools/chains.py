@@ -13,7 +13,7 @@ _counter = AutoCounter()
 
 
 
-def chain(start_tag: str = TITLE_TAG, end_tag: str = END_TAG, start: int = 1):
+def chain(start_tag: str = pp.TITLE_TAG, end_tag: str = pp.END_TAG, start: int = 1):
     """
         Print the function signature and return value
 
@@ -33,12 +33,12 @@ def chain(start_tag: str = TITLE_TAG, end_tag: str = END_TAG, start: int = 1):
         def wrapper_debug(*args, **kwargs):
             name = GetFunctionName(func)
             tag = start_tag.format(name)
-            signature = getPPrintStr({ 'kwargs': kwargs, 'args': args, })
+            signature = pp.getPPrintStr({ 'kwargs': kwargs, 'args': args, })
             _start = f'{name}(\n      {signature}\n   )'
 
-            PrintLines(END_TAG, tag, _start)
+            Print(pp.END_TAG, tag, _start)
             result = func(*args, **kwargs)
-            _end = f'{name} returned: {getPPrintStr(result)}\n'
+            _end = f'{name} returned: {pp.getPPrintStr(result)}\n'
             Print(_end, end_tag)
 
             return result
@@ -51,8 +51,8 @@ def _print_chain_signature(func: callable, tag: str, level: Union[int, AutoCount
     if signature and (args or kwargs):
         name = GetFunctionName(func)
         _tag = tag.format(f'{level} --> {name}')
-        signature = getPPrintStr({ 'args': args, 'kwargs': kwargs })
-        PrintLines(_tag, f'{name}(\n      {signature}\n   )', name, f'returned: \n{getPPrintStr(result)}')
+        signature = pp.getPPrintStr({ 'args': args, 'kwargs': kwargs })
+        Print(_tag, f'{name}(\n      {signature}\n   )', name, f'returned: \n{pp.getPPrintStr(result)}')
 def sub(level: int = None, *, tag: str = '-------------- level: {0}', signature: bool = False):
     """
         Print the function signature [Optional] and return value.
