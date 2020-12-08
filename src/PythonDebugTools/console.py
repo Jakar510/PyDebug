@@ -10,7 +10,7 @@ from typing import *
 
 __all__ = [
         # 'getPPrintStr',  'check', 'get_func_details', 'print_signature'
-        'PRINT', 'Print', 'print_exception',
+        'PRINT', 'Print', 'print_exception', 'PrettyPrint',
         # 'TITLE_TAG', 'DEFAULT_TAG', 'END_TAG',
         'Printer', 'pp', 'CallStack',
         'GetFunctionName', 'GetFuncModule',
@@ -85,7 +85,6 @@ class Printer(object):
         self._end = end
         self._use_double_quotes = use_double_quotes
         self._pp = _pp or NoStringWrappingPrettyPrinter.Create()
-        self.pprint = self._pp.pprint
 
     @property
     def debug(self) -> bool: return __debug__
@@ -109,6 +108,38 @@ class Printer(object):
             return p.print(*args)
 
     def print(self, *args): return print(*args, sep='\n', end=self._end, file=self._file)
+
+    @overload
+    def PrettyPrint(self, *args): ...
+    @overload
+    def PrettyPrint(self, title: str, *args): ...
+    @overload
+    def PrettyPrint(self, **kwargs): ...
+    @overload
+    def PrettyPrint(self, title: str, **kwargs): ...
+
+    def PrettyPrint(self, *args, **kwargs):
+        if kwargs:
+            if args and isinstance(args[0], str):
+                title = args[0]
+                with self as p:
+                    p.Print(title)
+                    p._pp.pprint(kwargs)
+
+            else: self._pp.pprint(kwargs)
+
+        elif args:
+            if isinstance(args[0], str):
+                title = args[0]
+                args = args[1:]
+                with self as p:
+                    p.Print(title)
+                    p._pp.pprint(args)
+
+            else: self._pp.pprint(args)
+
+
+
 
     def getPPrintStr(self, o: any) -> str:
         """
@@ -195,7 +226,7 @@ def PRINT(title: str, *args, tag: str = pp.TITLE_TAG, **kwargs):
     """
     with pp as p:
         p.Print(tag.format(title))
-        return p.pprint(dict(args=args, kwargs=kwargs))
+        return p.PrettyPrint(dict(args=args, kwargs=kwargs))
 
 
 
@@ -205,3 +236,17 @@ def Print(*args):
 
 
 def print_exception(e: Exception): return pp.print_exception(e)
+
+
+
+@overload
+def PrettyPrint(*args): ...
+@overload
+def PrettyPrint(title: str, *args): ...
+@overload
+def PrettyPrint(**kwargs): ...
+@overload
+def PrettyPrint(title: str, **kwargs): ...
+
+
+def PrettyPrint(*args, **kwargs): return pp.PrettyPrint(*args, **kwargs)
