@@ -9,8 +9,8 @@ from typing import *
 
 
 __all__ = [
-        # 'getPPrintStr', 'print_exception', 'check', 'get_func_details', 'print_signature'
-        'PRINT', 'Print',
+        # 'getPPrintStr',  'check', 'get_func_details', 'print_signature'
+        'PRINT', 'Print', 'print_exception',
         # 'TITLE_TAG', 'DEFAULT_TAG', 'END_TAG',
         'Printer', 'pp', 'CallStack',
         'GetFunctionName', 'GetFuncModule',
@@ -202,3 +202,6 @@ def PRINT(title: str, *args, tag: str = pp.TITLE_TAG, **kwargs):
 def Print(*args):
     with pp:
         return pp.Print(*args)
+
+
+def print_exception(e: Exception): return pp.print_exception(e)
