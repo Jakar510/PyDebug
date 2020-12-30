@@ -1,27 +1,22 @@
+import importlib
 import os
 
 from setuptools import setup
 
+from BaseExtensions.Setup import GetRequirements, ReadFromFile
 from src.PythonDebugTools import __author__, __classifiers__, __email__, __license__, __maintainer__, __maintainer_email__, __name__, __short_description__, __url__, __version__
 
 
 
 
-with open(os.path.abspath("requirements.txt"), "r") as f:
-    install_requires = f.readlines()
+long_description = ReadFromFile(os.path.abspath("PyPiReadme.md"))
 
-with open(os.path.abspath("README.md"), "r") as f:
-    long_description = f.read()
-
-data_files = [
-        f'{__name__}/*.py'
-        ]
+install_requires = GetRequirements(os.path.abspath('./requirements.txt'))
 
 setup(name=__name__,
       version=__version__,
       packages=[__name__],
       url=__url__,
-      # download_url=f'https://github.com/Jakar510/PythonDebugTools/releases/tag/{version}',
       license=__license__ or 'GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007',
       author=__author__,
       author_email=__email__,
@@ -35,6 +30,6 @@ setup(name=__name__,
       keywords='switch switch-case case',
       package_dir={ __name__: f'src/{__name__}' },
       package_data={
-              __name__: data_files,
+              __name__: [f'{__name__}/*.py'],
               },
       )
