@@ -162,8 +162,12 @@ class Printer(object):
     def print_exception(self, e: Exception):
         if self.can_print: return
 
+        if self._active:
+            return traceback.print_exception(type(e), e, e.__traceback__)
+
         with self._lock:
-            traceback.print_exception(type(e), e, e.__traceback__)
+            return traceback.print_exception(type(e), e, e.__traceback__)
+
 
     def get_func_details(self, func: callable, tag: str, result: Any, args, kwargs) -> Tuple[Any, str, str, str, str]:
         """
@@ -257,4 +261,5 @@ def PrettyPrint(**kwargs): ...
 def PrettyPrint(title: str, **kwargs): ...
 
 
-def PrettyPrint(*args, **kwargs): return pp.PrettyPrint(*args, **kwargs)
+def PrettyPrint(*args, **kwargs):
+    return pp.PrettyPrint(*args, **kwargs)
