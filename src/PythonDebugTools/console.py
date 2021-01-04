@@ -87,8 +87,9 @@ class Printer(object):
         self._pp = _pp or NoStringWrappingPrettyPrinter.Create()
 
     @property
-    def debug(self) -> bool: return __debug__
-    def check(self) -> bool: return not self.debug
+    def DEBUG(self) -> bool: return __debug__
+    @property
+    def can_print(self) -> bool: return not self.DEBUG
 
     def __enter__(self):
         self._active = True
@@ -100,14 +101,19 @@ class Printer(object):
 
 
     def Print(self, *args):
-        if self.check(): return
+        if self.can_print: return
         if self._active:
             return self.print(*args)
 
         with self as p:
             return p.print(*args)
 
-    def print(self, *args): return print(*args, sep='\n', end=self._end, file=self._file)
+    def print(self, *args):
+        if self._active:
+            return print(*args, sep='\n', end=self._end, file=self._file)
+
+        with self:
+            return print(*args, sep='\n', end=self._end, file=self._file)
 
     @overload
     def PrettyPrint(self, *args): ...
@@ -120,23 +126,23 @@ class Printer(object):
 
     def PrettyPrint(self, *args, **kwargs):
         if kwargs:
-            if args and isinstance(args[0], str):
-                title = args[0]
-                with self as p:
+            with self as p:
+                if args and isinstance(args[0], str):
+                    title = args[0]
                     p.Print(title)
                     p._pp.pprint(kwargs)
 
-            else: self._pp.pprint(kwargs)
+                else: p._pp.pprint(kwargs)
 
         elif args:
-            if isinstance(args[0], str):
-                title = args[0]
-                args = args[1:]
-                with self as p:
+            with self as p:
+                if isinstance(args[0], str):
+                    title = args[0]
+                    args = args[1:]
                     p.Print(title)
                     p._pp.pprint(args)
 
-            else: self._pp.pprint(args)
+                else: p._pp.pprint(args)
 
 
 
@@ -154,7 +160,7 @@ class Printer(object):
 
 
     def print_exception(self, e: Exception):
-        if self.check(): return
+        if self.can_print: return
 
         with self._lock:
             traceback.print_exception(type(e), e, e.__traceback__)
@@ -182,7 +188,7 @@ class Printer(object):
         return result, tag, name, signature, pp_result
 
     def print_signature(self, func: callable, tag: str, *args, **kwargs):
-        if not self.debug: return
+        if not self.DEBUG: return
         assert ('{0}' in tag)
 
         result = func(*args, **kwargs)
@@ -231,11 +237,13 @@ def PRINT(title: str, *args, tag: str = pp.TITLE_TAG, **kwargs):
 
 
 def Print(*args):
-    with pp:
-        return pp.Print(*args)
+    with pp as p:
+        return p.Print(*args)
 
 
-def print_exception(e: Exception): return pp.print_exception(e)
+def print_exception(e: Exception):
+    with pp as p:
+        return p.print_exception(e)
 
 
 

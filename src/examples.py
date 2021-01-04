@@ -71,7 +71,7 @@ if __name__ == '__main__':
         PRINT('__json__', d)
 
     _threads = []
-    _threads.append(threading.Thread(target=_json, daemon=True))
+    # _threads.append(threading.Thread(target=_json, daemon=True))
     t = test()
 
 

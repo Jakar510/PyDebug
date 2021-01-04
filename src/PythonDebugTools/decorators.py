@@ -63,7 +63,7 @@ def SimpleDebug(func: callable):
     @functools.wraps(func)
     def wrapper_debug(*args, **kwargs):
         result = func(*args, **kwargs)
-        if pp.check(): return result
+        if pp.can_print(): return result
         name = GetFunctionName(func)
         start = f"--------- CALLED: {name}\n"
         _end = f"--------- ENDED: {name}\n"
@@ -81,7 +81,7 @@ def Debug(*, tag: str = pp.DEFAULT_TAG):
         @functools.wraps(func)
         def wrapper_debug(*args, **kwargs):
             result = func(*args, **kwargs)
-            if pp.check(): return result
+            if pp.can_print(): return result
             result, _tag, name, signature, pp_result = pp.get_func_details(func, tag, result, args, kwargs)
             Print(_tag, signature, f"{name}  returned  {pp_result}\n")
 
@@ -108,7 +108,7 @@ def CheckTime(*, Precision: int = 5, tag: str = pp.TITLE_TAG):
     def wrapper(func: callable):
         @functools.wraps(func)
         def timed(*args, **kwargs):
-            if pp.check(): return func(*args, **kwargs)
+            if pp.can_print(): return func(*args, **kwargs)
             start_time = time.time()
             result = func(*args, **kwargs)
             _time = RoundFloat(time.time() - start_time, Precision=Precision)
@@ -134,7 +134,7 @@ def CheckTimeWithSignature(*, Precision: int = 5, tag: str = pp.TITLE_TAG):
     def wrapper(func: callable):
         @functools.wraps(func)
         def timed(*args, **kwargs):
-            if pp.check(): return func(*args, **kwargs)
+            if pp.can_print(): return func(*args, **kwargs)
             start_time = time.time()
             result = func(*args, **kwargs)
             _time = RoundFloat(time.time() - start_time, Precision=Precision)
@@ -160,7 +160,7 @@ def DebugTkinterEvent(*, tag: str = pp.TITLE_TAG):
         @functools.wraps(func)
         def wrapper_debug(self, event: Event, *args, **kwargs):
             result = func(self, event, *args, **kwargs)
-            if pp.check(): return result
+            if pp.can_print(): return result
             name = GetFunctionName(func)
             _tag = tag.format(f'{name}')
             start = f'{name}.{event.__class__}'
@@ -194,7 +194,7 @@ def StackTrace(*, INDENT=4 * ' ', tag: str = pp.TITLE_TAG):
         @functools.wraps(func)
         def wrapped(*args, **kwargs):
             result = func(*args, **kwargs)
-            if pp.check(): return result
+            if pp.can_print(): return result
             result, _tag, name, signature, pp_result = pp.get_func_details(func, tag, result, args, kwargs)
             callstack = CallStack(INDENT)
             call = f'{name}() called:'
@@ -222,7 +222,7 @@ def StackTraceWithSignature(*, INDENT=4 * ' ', tag: str = pp.TITLE_TAG):
         @functools.wraps(func)
         def wrapped(*args, **kwargs):
             result = func(*args, **kwargs)
-            if pp.check(): return result
+            if pp.can_print(): return result
             result, _tag, name, signature, pp_result = pp.get_func_details(func, tag, result, args, kwargs)
             callstack = CallStack(INDENT)
             call = f'{name}() called: '
