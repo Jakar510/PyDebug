@@ -1,5 +1,7 @@
 # PythonDebugTools
 
+This has been merged into [New Package: PythonExtensions](https://github.com/Jakar510/PythonExtensions) and will no longer be maintained and will be removed from pypi in due time.
+
 *Pull requests and sugestions are welcome.*
 
 ## Getting Started
